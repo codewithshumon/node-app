@@ -1,0 +1,14 @@
+{
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 80,
+  "overrides": [
+    {
+      "files": "*.js",
+      "options": {
+        "printWidth": 100,
+        "parser": "babel"
+      }
+    }
+  ]
+}
