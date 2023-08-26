@@ -12,9 +12,9 @@ const lib = require('./lib/data');
 const app = {};
 
 //modify
-lib.create('test', 'newFile', { name: 'shumon' }, (err) => {
-  console.log(err);
-});
+// lib.create('test', 'newFile', { name: 'shumon' }, (err) => {
+//   console.log(err);
+// });
 
 app.createServer = () => {
   console.log(envExport.name);

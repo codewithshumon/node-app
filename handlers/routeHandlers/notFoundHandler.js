@@ -1,9 +1,9 @@
-const handler = {};
+const handle = {};
 
-handler.notFoundHandler = (requestProperties, callback) => {
+handle.notFoundHandler = (requestProperties, callback) => {
   callback(404, {
     message: 'Page not found',
   });
 };
 
-module.exports = handler;
+module.exports = handle;
