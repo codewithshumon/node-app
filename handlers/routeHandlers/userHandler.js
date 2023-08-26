@@ -44,7 +44,7 @@ handle._users.post = (requestProperties, callback) => {
       ? requestProperties.body.password
       : null;
   const tosAgree =
-    typeof requestProperties.body.tosAgree === 'boolean' && requestProperties.body.tosAgree === true
+    typeof requestProperties.body.tosAgree === 'boolean' && requestProperties.body.tosAgree
       ? requestProperties.body.tosAgree
       : null;
   if (firstName && lastName && phone && password && tosAgree) {
@@ -77,7 +77,7 @@ handle._users.post = (requestProperties, callback) => {
     });
   } else {
     callback(400, {
-      error: 'There is a probelm with your request',
+      Error: 'There is a probelm with your request',
     });
   }
 };
