@@ -14,8 +14,6 @@ utilites.perseJSON = (jsonString) => {
     return output;
 };
 
-console.log(this.perseJSON);
-
 utilites.hash = (string) => {
     if (typeof string === 'string' && string.length > 0) {
         const hash = crypto.createHmac('sha256', envExport.secretKey).update(string).digest('hex');
