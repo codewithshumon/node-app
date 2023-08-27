@@ -59,7 +59,6 @@ handle._users.post = (requestProperties, callback) => {
                     tosAgree,
                 };
                 lib.create('users', phone, userObject, (err2) => {
-                    console.log(err2);
                     if (!err2) {
                         callback(200, {
                             Success: 'User created',
@@ -137,7 +136,6 @@ handle._users.put = (requestProperties, callback) => {
         typeof requestProperties.body.tosAgree === 'boolean' && requestProperties.body.tosAgree
             ? requestProperties.body.tosAgree
             : null;
-
     if (phone) {
         if (firstName || lastName || password) {
             lib.read('users', phone, (err, uData) => {
@@ -153,13 +151,12 @@ handle._users.put = (requestProperties, callback) => {
                         userData.password = hash(password);
                     }
 
-                    lib.update('user', phone, userData, (err) => {
+                    lib.update('users', phone, userData, (err) => {
                         if (!err) {
                             callback(200, {
                                 Error: 'Data updated successfully!',
                             });
                         } else {
-                            console.log(err);
                             callback(400, {
                                 Error: 'There was a error updating data!',
                             });
@@ -182,5 +179,41 @@ handle._users.put = (requestProperties, callback) => {
         });
     }
 };
-handle._users.delete = (requestProperties, callback) => {};
+
+handle._users.delete = (requestProperties, callback) => {
+    const phone =
+        typeof requestProperties.queryStringObject.phone === 'string' &&
+        requestProperties.queryStringObject.phone.trim().length === 11
+            ? requestProperties.queryStringObject.phone
+            : false;
+
+    if (phone) {
+        lib.delete('users', phone, (err, userData) => {
+            console.log(err);
+            if (!err && userData) {
+                lib.delete('users', phone, (err) => {
+                    if (!err) {
+                        callback(200, {
+                            message: 'User successfully deleted',
+                        });
+                    } else {
+                        console.log('finding user not found', err);
+                        callback(500, {
+                            Error: 'User not found',
+                        });
+                    }
+                });
+            } else {
+                callback(500, {
+                    Error: 'There was a server error',
+                });
+            }
+        });
+    } else {
+        callback(400, {
+            Error: 'There was a problem in your request',
+        });
+    }
+};
+
 module.exports = handle;
