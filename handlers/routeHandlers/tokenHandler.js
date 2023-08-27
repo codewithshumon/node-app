@@ -1,5 +1,5 @@
 const lib = require('../../lib/data');
-const { hash } = require('../../helpers/utilities');
+const { hash, randomString } = require('../../helpers/utilities');
 const { perseJSON } = require('../../helpers/utilities');
 
 const handle = {};
@@ -33,8 +33,24 @@ handle._token.post = (requestProperties, callback) => {
     if (phone && password) {
         lib.read('users', phone, (err, userData) => {
             const hasPassword = hash(password);
-            if (hasPassword === userData.password) {
-                a;
+            if (hasPassword === perseJSON(userData).password) {
+                const tokenId = randomString(20);
+                const tokenExpire = Date.now() + 60 * 60 * 1000;
+                const tokenObject = {
+                    phone: phone,
+                    id: tokenId,
+                    tvalid: tokenExpire,
+                };
+
+                lib.create('tokens', phone, tokenObject, (err) => {
+                    if (!err) {
+                        callback(200, tokenObject);
+                    } else {
+                        callback(500, {
+                            error: 'Token already exist',
+                        });
+                    }
+                });
             } else {
                 callback(400, {
                     error: 'Invalid user and password',
