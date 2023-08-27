@@ -189,7 +189,6 @@ handle._users.delete = (requestProperties, callback) => {
 
     if (phone) {
         lib.delete('users', phone, (err, userData) => {
-            console.log(err);
             if (!err && userData) {
                 lib.delete('users', phone, (err) => {
                     if (!err) {
@@ -197,7 +196,6 @@ handle._users.delete = (requestProperties, callback) => {
                             message: 'User successfully deleted',
                         });
                     } else {
-                        console.log('finding user not found', err);
                         callback(500, {
                             Error: 'User not found',
                         });
