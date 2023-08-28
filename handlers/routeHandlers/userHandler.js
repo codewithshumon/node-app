@@ -231,13 +231,13 @@ handle._users.delete = (requestProperties, callback) => {
                                 });
                             } else {
                                 callback(500, {
-                                    Error: 'User not found',
+                                    Error: 'There was a server error',
                                 });
                             }
                         });
                     } else {
-                        callback(500, {
-                            Error: 'There was a server error',
+                        callback(403, {
+                            error: 'Authentication failed',
                         });
                     }
                 });
