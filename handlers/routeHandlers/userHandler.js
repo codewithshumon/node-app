@@ -1,6 +1,7 @@
 const lib = require('../../lib/data');
 const { hash } = require('../../helpers/utilities');
 const { perseJSON } = require('../../helpers/utilities');
+const tokenHandler = require('./tokenHandler');
 
 const handle = {};
 
@@ -188,7 +189,7 @@ handle._users.delete = (requestProperties, callback) => {
             : false;
 
     if (phone) {
-        lib.delete('users', phone, (err, userData) => {
+        lib.read('users', phone, (err, userData) => {
             if (!err && userData) {
                 lib.delete('users', phone, (err) => {
                     if (!err) {
