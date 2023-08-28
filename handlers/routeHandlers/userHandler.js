@@ -1,6 +1,7 @@
 const lib = require('../../lib/data');
 const { hash } = require('../../helpers/utilities');
 const { perseJSON } = require('../../helpers/utilities');
+const tokenHandler = require('./tokenHandler');
 
 const handle = {};
 
@@ -89,14 +90,27 @@ handle._users.get = (requestProperties, callback) => {
             ? requestProperties.queryStringObject.phone
             : false;
     if (phone) {
-        lib.read('users', phone, (err, useData) => {
-            const user = { ...perseJSON(useData) };
-            if (!err && user) {
-                delete user.password;
-                callback(200, user);
+        let token =
+            typeof requestProperties.headersObject.token === 'string'
+                ? requestProperties.headersObject.token
+                : false;
+
+        tokenHandler._token.verify(token, phone, (tokenId) => {
+            if (tokenId) {
+                lib.read('users', phone, (err, useData) => {
+                    const user = { ...perseJSON(useData) };
+                    if (!err && user) {
+                        delete user.password;
+                        callback(200, user);
+                    } else {
+                        callback(404, {
+                            error: 'User not found! Create new user',
+                        });
+                    }
+                });
             } else {
-                callback(404, {
-                    error: 'User not found! Create new user',
+                callback(403, {
+                    error: 'Authentication failed',
                 });
             }
         });
@@ -138,33 +152,46 @@ handle._users.put = (requestProperties, callback) => {
             : null;
     if (phone) {
         if (firstName || lastName || password) {
-            lib.read('users', phone, (err, uData) => {
-                const userData = { ...perseJSON(uData) };
-                if (!err && userData) {
-                    if (firstName) {
-                        userData.firstName = firstName;
-                    }
-                    if (lastName) {
-                        userData.lastName = lastName;
-                    }
-                    if (password) {
-                        userData.password = hash(password);
-                    }
+            let token =
+                typeof requestProperties.headersObject.token === 'string'
+                    ? requestProperties.headersObject.token
+                    : false;
 
-                    lib.update('users', phone, userData, (err) => {
-                        if (!err) {
-                            callback(200, {
-                                Error: 'Data updated successfully!',
+            tokenHandler._token.verify(token, phone, (tokenId) => {
+                if (tokenId) {
+                    lib.read('users', phone, (err, uData) => {
+                        const userData = { ...perseJSON(uData) };
+                        if (!err && userData) {
+                            if (firstName) {
+                                userData.firstName = firstName;
+                            }
+                            if (lastName) {
+                                userData.lastName = lastName;
+                            }
+                            if (password) {
+                                userData.password = hash(password);
+                            }
+
+                            lib.update('users', phone, userData, (err) => {
+                                if (!err) {
+                                    callback(200, {
+                                        Error: 'Data updated successfully!',
+                                    });
+                                } else {
+                                    callback(400, {
+                                        Error: 'There was a error updating data!',
+                                    });
+                                }
                             });
                         } else {
                             callback(400, {
-                                Error: 'There was a error updating data!',
+                                Error: 'Invalid phone number, please try again!',
                             });
                         }
                     });
                 } else {
-                    callback(400, {
-                        Error: 'Invalid phone number, please try again!',
+                    callback(403, {
+                        error: 'Authentication failed',
                     });
                 }
             });
@@ -188,22 +215,35 @@ handle._users.delete = (requestProperties, callback) => {
             : false;
 
     if (phone) {
-        lib.delete('users', phone, (err, userData) => {
-            if (!err && userData) {
-                lib.delete('users', phone, (err) => {
-                    if (!err) {
-                        callback(200, {
-                            message: 'User successfully deleted',
+        let token =
+            typeof requestProperties.headersObject.token === 'string'
+                ? requestProperties.headersObject.token
+                : false;
+
+        tokenHandler._token.verify(token, phone, (tokenId) => {
+            if (tokenId) {
+                lib.read('users', phone, (err, userData) => {
+                    if (!err && userData) {
+                        lib.delete('users', phone, (err) => {
+                            if (!err) {
+                                callback(200, {
+                                    message: 'User successfully deleted',
+                                });
+                            } else {
+                                callback(500, {
+                                    Error: 'User not found',
+                                });
+                            }
                         });
                     } else {
                         callback(500, {
-                            Error: 'User not found',
+                            Error: 'There was a server error',
                         });
                     }
                 });
             } else {
-                callback(500, {
-                    Error: 'There was a server error',
+                callback(403, {
+                    error: 'Authentication failed',
                 });
             }
         });

@@ -19,7 +19,7 @@ utilites.randomString = (stringLength) => {
     length = typeof stringLength === 'number' && stringLength > 0 ? stringLength : false;
 
     if (length) {
-        const tokenCharacter = 'abcdefghijklmnopqrestvwxyz0123456789@#$%&*/!+';
+        const tokenCharacter = 'abcdefghijklmnopqrestvwxyz0123456789';
         let tokenOutput = '';
 
         for (let i = 1; i <= length; i++) {
