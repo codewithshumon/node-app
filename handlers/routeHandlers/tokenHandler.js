@@ -42,7 +42,7 @@ handle._token.post = (requestProperties, callback) => {
                     tvalid: tokenExpire,
                 };
 
-                lib.create('tokens', phone, tokenObject, (err) => {
+                lib.create('tokens', tokenId, tokenObject, (err) => {
                     if (!err) {
                         callback(200, tokenObject);
                     } else {
