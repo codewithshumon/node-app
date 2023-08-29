@@ -1,5 +1,5 @@
 const lib = require('../../lib/data');
-const { hash, randomString } = require('../../helpers/utilities');
+const { randomString } = require('../../helpers/utilities');
 const { perseJSON } = require('../../helpers/utilities');
 const tokenHandler = require('./tokenHandler');
 const envExport = require('../../helpers/env');
@@ -34,7 +34,7 @@ handle._check.post = (requestProperties, callback) => {
             : false;
     const method =
         typeof requestProperties.body.method === 'string' &&
-        ['get', 'post', 'put', 'delete'].indexOf(requestProperties.body.method) > -1
+        ['GET', 'POST', 'PUT', 'DELETE'].indexOf(requestProperties.body.method) > -1
             ? requestProperties.body.method
             : false;
     const successCode =
@@ -61,7 +61,7 @@ handle._check.post = (requestProperties, callback) => {
                 const phone = tokenData.phone;
                 lib.read('users', phone, (err, uData) => {
                     const userData = { ...perseJSON(uData) };
-                    if (!err && userData) {
+                    if (!err && uData) {
                         tokenHandler._token.verify(token, phone, (tokenId) => {
                             if (tokenId) {
                                 const userChecks =
@@ -81,6 +81,26 @@ handle._check.post = (requestProperties, callback) => {
                                         successCode: successCode,
                                         timeoutSeconds: timeoutSeconds,
                                     };
+
+                                    lib.create('checks', checkId, checkObject, (err) => {
+                                        if (!err) {
+                                            userData.checks = userChecks;
+                                            userData.checks.push(checkId);
+                                            lib.update('users', phone, userData, (err) => {
+                                                if (!err) {
+                                                    callback(200, checkObject);
+                                                } else {
+                                                    callback(500, {
+                                                        error: 'Can not update user data',
+                                                    });
+                                                }
+                                            });
+                                        } else {
+                                            callback(500, {
+                                                error: 'Can not create check',
+                                            });
+                                        }
+                                    });
                                 } else {
                                     callback(401, {
                                         error: 'Max checks reached',
@@ -100,7 +120,7 @@ handle._check.post = (requestProperties, callback) => {
                 });
             } else {
                 callback(403, {
-                    error: 'Authontication failed',
+                    error: 'Authontication token not found',
                 });
             }
         });
