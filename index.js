@@ -12,7 +12,7 @@ const notification = require('./helpers/notification');
 const app = {};
 
 notification.sendTwilioSms('01312184141', 'Hi Shumon Khan', (err) => {
-    console.log('The error was', err);
+    console.log(err);
 });
 //modify
 // lib.create('test', 'newFile', { name: 'shumon' }, (err) => {
