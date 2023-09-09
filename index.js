@@ -4,28 +4,17 @@
  * Author: Shumon Khan
  */
 
-const http = require('http');
-const { handleReqRes } = require('./helpers/handleReqRes');
-const envExport = require('./helpers/env');
-const notification = require('./helpers/notification');
+const server = require('./lib/server');
+const workers = require('./lib/worker');
 
 const app = {};
 
-notification.sendTwilioSms('01312184141', 'Hi Shumon Khan', (err) => {
-    console.log(err);
-});
-//modify
-// lib.create('test', 'newFile', { name: 'shumon' }, (err) => {
-//   console.log(err);
-// });
+app.init = () => {
+    server.init();
 
-app.createServer = () => {
-    console.log(envExport.name);
-    const server = http.createServer(app.handleReqRes);
-    server.listen(envExport.port, () => {
-        console.log(`listening to port ${envExport.port}`);
-    });
+    workers.init();
 };
 
-app.handleReqRes = handleReqRes;
-app.createServer();
+app.init();
+
+module.exports = app;

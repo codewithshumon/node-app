@@ -8,7 +8,7 @@ env.staging = {
     twilio: {
         fromPhone: '+18642728453',
         accountSid: 'AC2d616d4eea215c745b50bd9e85b9e6af',
-        authToken: '24300072b2d2daa396c10eeaa4a16db1',
+        authToken: 'e464f4d9c051976d2f2db4e8b7a6c9ec',
     },
 };
 
@@ -20,7 +20,7 @@ env.production = {
     twilio: {
         fromPhone: '+18642728453',
         accountSid: 'AC2d616d4eea215c745b50bd9e85b9e6af',
-        authToken: '24300072b2d2daa396c10eeaa4a16db1',
+        authToken: 'e464f4d9c051976d2f2db4e8b7a6c9ec',
     },
 };
 const currentEnv = typeof process.env.NODE_ENV === 'string' ? process.env.NODE_ENV : 'staging';
