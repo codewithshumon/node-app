@@ -46,6 +46,7 @@ notifications.sendTwilioSms = (phone, msg, callback) => {
             res.on('end', () => {
                 if (res.statusCode === 200 || res.statusCode === 201) {
                     callback(
+                        false,
                         `Message sent successfully. Response: ${responseData} and ${res.statusCode}`,
                     );
                 } else {
