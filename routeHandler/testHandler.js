@@ -1,10 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const router = express.Router();
 const testSchema = require('../schemas/testSchemas');
+const checkLogin = require('../middlewares/checkLogin');
+const router = express.Router();
 const Test = new mongoose.model('Test', testSchema);
 
-router.get('/', async (req, res) => {
+// protected with token checkLogin
+router.get('/', checkLogin, async (req, res) => {
+    console.log([req.username, req.userid]);
     try {
         const result = await Test.find({ status: 'active' }).select({
             _id: 0, // 0 means hide the field
@@ -192,6 +195,8 @@ router.get('/find/js', async (req, res) => {
         });
     }
 });
+
+// use of query methos
 // get active test
 router.get('/find/language', async (req, res) => {
     try {
