@@ -16,4 +16,17 @@ const testSchema = mongoose.Schema({
     },
 });
 
+//instance methods
+testSchema.methods = {
+    findActive: () => {
+        return mongoose.model('Test').find({ status: 'active' });
+    },
+};
+
+//static methods
+testSchema.static = {
+    findByJs: () => {
+        return this.find({ title: /js/i });
+    },
+};
 module.exports = testSchema;

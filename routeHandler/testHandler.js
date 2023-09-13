@@ -156,4 +156,41 @@ router.delete('/find/:id', async (req, res) => {
     }
 });
 
+// use of instance methos
+// get active test
+router.get('/active', async (req, res) => {
+    const test = new Test();
+    try {
+        const data = await test.findActive();
+        console.log(data);
+        res.status(200).json({
+            result: data,
+            message: 'The test is found successfully',
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: 'There was a server error',
+        });
+    }
+});
+
+// use of static methos
+// get active test
+router.get('/js', async (req, res) => {
+    try {
+        const test = await Test.findByJs();
+        console.log(test);
+        res.status(200).json({
+            result: test,
+            message: 'The test is found successfully',
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: 'There was a server error',
+        });
+    }
+});
+
 module.exports = router;
