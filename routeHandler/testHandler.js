@@ -177,9 +177,25 @@ router.get('/active', async (req, res) => {
 
 // use of static methos
 // get active test
-router.get('/js', async (req, res) => {
+router.get('/find/js', async (req, res) => {
     try {
         const test = await Test.findByJs();
+        console.log(test);
+        res.status(200).json({
+            result: test,
+            message: 'The test is found successfully',
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: 'There was a server error',
+        });
+    }
+});
+// get active test
+router.get('/find/language', async (req, res) => {
+    try {
+        const test = await Test.find().byLanguage('JS');
         console.log(test);
         res.status(200).json({
             result: test,
