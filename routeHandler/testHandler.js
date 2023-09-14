@@ -1,12 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const testSchema = require('../schemas/testSchemas');
+const userSchema = require('../schemas/userSchema');
 const checkLogin = require('../middlewares/checkLogin');
 const router = express.Router();
 const Test = new mongoose.model('Test', testSchema);
+const User = new mongoose.model('User', userSchema);
 
 // protected with token checkLogin
-router.get('/', checkLogin, async (req, res) => {
+router.get('/', async (req, res) => {
     console.log([req.username, req.userid]);
     try {
         const result = await Test.find({ status: 'active' }).select({
@@ -27,7 +29,7 @@ router.get('/', checkLogin, async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('id/:id', async (req, res) => {
     try {
         const result = await Test.find({ _id: req.params.id });
         console.log(result);
@@ -41,10 +43,11 @@ router.get('/:id', async (req, res) => {
         });
     }
 });
+
 router.post('/', async (req, res) => {
     const newTest = new Test(req.body);
     try {
-        await newTest.save();
+        await newTest.save(); //.save() is instance method
         res.status(200).json({
             message: 'Test was inserted successfully',
         });
@@ -57,7 +60,7 @@ router.post('/', async (req, res) => {
 
 router.post('/all', async (req, res) => {
     try {
-        await Test.insertMany(req.body);
+        await Test.insertMany(req.body); //insertMany() is statics method
         res.status(200).json({
             message: 'All tests were inserted successfully',
         });
@@ -68,7 +71,7 @@ router.post('/all', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('id/:id', async (req, res) => {
     try {
         const result = await Test.findByIdAndUpdate(
             { _id: req.params.id },
@@ -91,7 +94,7 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-router.put('/find/:id', async (req, res) => {
+router.put('/find/id/:id', async (req, res) => {
     const idToUpdate = req.params.id;
     const updateData = {
         $unset: {
@@ -121,7 +124,7 @@ router.put('/find/:id', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('id/:id', async (req, res) => {
     try {
         const result = await Test.deleteOne({ _id: req.params.id });
         console.log(result);
@@ -136,7 +139,7 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-router.delete('/find/:id', async (req, res) => {
+router.delete('/find/id/:id', async (req, res) => {
     const idToDelete = req.params.id;
 
     try {
@@ -158,6 +161,11 @@ router.delete('/find/:id', async (req, res) => {
         });
     }
 });
+
+//
+//
+//
+//
 
 // use of instance methos
 // get active test
@@ -211,6 +219,88 @@ router.get('/find/language', async (req, res) => {
         res.status(500).json({
             error: 'There was a server error',
         });
+    }
+});
+
+//
+//
+//
+//
+
+// authentication token with testHandler
+// protected with token checkLogin
+
+//making relation with User data in Tast data
+router.get('/auth', checkLogin, async (req, res) => {
+    console.log([req.username, req.userid]);
+    try {
+        const result = await Test.find({})
+            .populate('user', 'name username -_id')
+            //populate bringi all userdata and use of name username ony watch these data nad "-" means not watch the data like _id
+            .select({
+                _id: 0, // 0 means hide the field
+                __v: 0,
+                date: 0,
+            })
+            .limit(1);
+        console.log(result);
+
+        res.status(200).json({
+            result: result,
+            message: 'The test was found successfully',
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: 'There was a server error',
+        });
+    }
+});
+
+router.post('/auth', checkLogin, async (req, res) => {
+    const newTest = new Test({
+        ...req.body,
+        user: req.userId,
+    });
+    try {
+        const todo = await newTest.save();
+        //User.updateOne to update tests option in UserData like array
+        await User.updateOne(
+            {
+                _id: req.userId,
+            },
+            {
+                $push: {
+                    tests: todo._id,
+                },
+            },
+        );
+        res.status(200).json({
+            message: 'Test was inserted successfully',
+        });
+    } catch (err) {
+        res.status(500).json({
+            error: 'There was a server error',
+        });
+    }
+});
+
+router.post('/auth/all', checkLogin, async (req, res) => {
+    const testDocuments = req.body.map((testData) => ({
+        ...testData,
+        user: req.userId,
+    }));
+
+    try {
+        await Test.insertMany(testDocuments);
+        res.status(200).json({
+            message: 'All tests were inserted successfully',
+        });
+    } catch (err) {
+        res.status(500).json({
+            error: 'There was a server error',
+        });
+        console.log(err);
     }
 });
 

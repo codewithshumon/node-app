@@ -10,7 +10,7 @@ const checkLogin = (req, res, next) => {
         req.userId = userId;
         next();
     } catch (error) {
-        next(`'Athuntication failed' ${error}`);
+        next(`Athuntication failed Error: ${error}`);
     }
 };
 

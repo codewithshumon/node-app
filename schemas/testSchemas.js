@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const testSchema = mongoose.Schema({
     title: {
         type: String,
-        required: true, // Change "require" to "required"
     },
     description: String,
     status: {
@@ -13,6 +12,11 @@ const testSchema = mongoose.Schema({
     date: {
         type: Date,
         default: Date.now,
+    },
+    //makeing relation with User and Test
+    user: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
     },
 });
 

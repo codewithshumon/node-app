@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const router = express.Router();
-const usertSchema = require('../schemas/userSchema');
-const User = new mongoose.model('User', usertSchema);
+const userSchema = require('../schemas/userSchema');
+const User = new mongoose.model('User', userSchema);
+const checkLogin = require('../middlewares/checkLogin');
 
 // User signup route
 router.post('/signup', async (req, res) => {
@@ -68,62 +69,21 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/signup', async (req, res) => {
+//getting tests data from user data
+router.get('/auth', checkLogin, async (req, res) => {
+    console.log([req.username, req.userid]);
     try {
-        const result = await User.find({ status: 'active' }).select({
-            _id: 0, // 0 means hide the field
-            __v: 0,
-            date: 0,
-        });
-        console.log(result);
-
-        res.status(200).json({
-            result: result,
-            message: 'The User was found successfully',
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: 'There was a server error',
-        });
-    }
-});
-
-router.put('/:id', async (req, res) => {
-    try {
-        const result = await User.findByIdAndUpdate(
-            { _id: req.params.id },
-            {
-                $set: {
-                    status: 'inactive',
-                    title: 'learn with Shumon khan saam',
-                },
-            },
-            { new: true },
-        );
-        console.log(result);
-        res.status(200).json({
-            message: 'All Users were updated successfully',
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: 'There was a server error',
-        });
-    }
-});
-
-router.delete('/:id', async (req, res) => {
-    try {
-        const result = await User.deleteOne({ _id: req.params.id });
+        const result = await User.find({ status: 'active' }).populate('tests');
         console.log(result);
         res.status(200).json({
             result: result,
-            message: 'The User is deleted successfully',
+            message: 'The test was found successfully',
         });
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             error: 'There was a server error',
         });
     }
 });
-
 module.exports = router;

@@ -18,6 +18,13 @@ const userSchema = mongoose.Schema({
         type: String,
         enum: ['active', 'inactive'],
     },
+    //makeing relation with User and Test
+    tests: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: 'Test',
+        },
+    ],
 });
 
 module.exports = userSchema;
